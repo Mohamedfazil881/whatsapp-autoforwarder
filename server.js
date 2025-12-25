@@ -36,6 +36,7 @@ const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
         headless: true,
+        executablePath: fs.existsSync('/usr/bin/google-chrome-stable') ? '/usr/bin/google-chrome-stable' : (fs.existsSync('/usr/bin/google-chrome') ? '/usr/bin/google-chrome' : undefined),
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
