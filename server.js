@@ -73,8 +73,47 @@ const initializeClient = async () => {
         await client.initialize();
     } catch (e) {
         console.error('Initialization error:', e);
-        io.emit('log', 'Initialization failed. Retrying in 5s...');
         updateStatus('Init Error');
+
+        // AUTO-FIX for "Execution context destroyed" or Session Corruption
+        const errorMsg = e.message || '';
+        if (errorMsg.includes('Execution context was destroyed') ||
+            errorMsg.includes('Protocol error') ||
+            errorMsg.includes('Evaluation failed')) {
+
+            io.emit('log', 'CRITICAL ERROR: Session corrupted. Performing auto-cleanup...');
+            console.log('Detected fatal error. Cleaning up session data...');
+
+            // Attempt to destroy client to release locks
+            try { await client.destroy(); } catch (err) { }
+
+            // Delete session files
+            const authPath = path.join(__dirname, '.wwebjs_auth');
+            const cachePath = path.join(__dirname, '.wwebjs_cache');
+
+            setTimeout(() => {
+                try {
+                    // Using recursive delete
+                    if (fs.existsSync(authPath)) {
+                        fs.rmSync(authPath, { recursive: true, force: true });
+                        console.log('Deleted .wwebjs_auth');
+                    }
+                    if (fs.existsSync(cachePath)) {
+                        fs.rmSync(cachePath, { recursive: true, force: true });
+                        console.log('Deleted .wwebjs_cache');
+                    }
+                    io.emit('log', 'Session reset. Restarting in 3s...');
+                } catch (rmErr) {
+                    console.error('Failed to cleanup session files:', rmErr);
+                    io.emit('log', 'Auto-cleanup failed. Please run fix_connection.bat manually.');
+                }
+
+                setTimeout(initializeClient, 3000);
+            }, 1000);
+            return;
+        }
+
+        io.emit('log', 'Initialization failed. Retrying in 5s...');
         setTimeout(initializeClient, 5000);
     }
 };
