@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKSBV AutoForwarder</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <header>
+            <div class="logo">SKSBV Automation</div>
+            <div class="status-badge" id="status-badge">Disconnected</div>
+        </header>
+
+        <main>
+            <!-- Connection Section -->
+            <section id="connection-section" class="active">
+                <div class="card glass">
+                    <h2>WhatsApp Connection</h2>
+                    <div id="qr-container">
+                        <div id="qr-loading" class="spinner"></div>
+                        <p id="qr-text">Starting WhatsApp Engine... Please wait.</p>
+                        <img id="qr-image" src="" alt="QR Code" style="display:none;">
+                    </div>
+                    <p class="instruction">Open WhatsApp > Linked Devices > Link a Device</p>
+                </div>
+            </section>
+
+            <!-- Dashboard Section (Hidden until connected) -->
+            <section id="dashboard-section" style="display:none;">
+                <div class="card glass">
+                    <h2>Forwarding Rules</h2>
+                    <div class="form-group" style="display:flex; justify-content:space-between; align-items:center">
+                        <label>Source Group (From)</label>
+                        <button id="refresh-groups-btn" class="btn delete-btn"
+                            style="border:1px solid var(--primary); color:var(--primary); width:auto;">↻ Refresh
+                            Groups</button>
+                    </div>
+                    <div class="form-group">
+                        <select id="source-select">
+                            <option value="">Loading groups...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Target Group (To)</label>
+                        <select id="target-select">
+                            <option value="">Loading groups...</option>
+                        </select>
+                    </div>
+
+                    <button id="add-rule-btn" class="btn primary">Add Rule</button>
+
+                    <div class="rules-list" id="rules-list">
+                        <!-- Rules will appear here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Logs Section -->
+            <section>
+                <div class="card glass">
+                    <h2>Live Logs</h2>
+                    <div class="logs-container" id="logs-container">
+                        <div class="log-entry">System initialized...</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
